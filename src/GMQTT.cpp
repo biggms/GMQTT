@@ -1,69 +1,93 @@
-#include "GMQTT.h"
+#include "GMQTT.hpp"
+#include "MQTTDevices/MQTTBinarySensor.hpp"
 
 GMQTT::GMQTT()
 {
 }
 
-
-void GMQTT::setup( const char* pSystemName, const char* pHost, int pPort, MQTT_CALLBACK_SIGNATURE )
+void GMQTT::setup( String pSystemName, const char* pHost, int pPort, bool pAddStateSensor, bool pDoDiscovery )
 {
-  theSystemName = pSystemName;
-  theClient.setClient( theWifi );
-  theClient.setServer( pHost, pPort );
-  theClient.setCallback( callback );
+	theSystemName = pSystemName;
+	theClient.setClient( theWifi );
+	theClient.setServer( pHost, pPort );
+	theClient.setCallback( [ = ](char *pTopic, byte *pPayload, unsigned int pLength){
+		this->callback( pTopic, pPayload, pLength );
+	} );
+	if( pAddStateSensor )
+	{
+		theStateSensor = new MQTTBinarySensor();
+		theStateSensor->setup( this, theSystemName + "system", "system/" + pSystemName, "connectivity" );
+	}
+	theDoDiscovery = pDoDiscovery;
+}
+
+void GMQTT::callback(char* pTopic, byte* pPayload, unsigned int pLength)
+{
+	String lPayload = "";
+	for (int i = 0; i < pLength; i++)
+	{
+		lPayload += (char)pPayload[i];
+	}
+	String lTopic = pTopic;
+
+	for( int i = 0; i < theListeners.size(); i++ )
+	{
+		theListeners[i]->newMessage( lTopic, lPayload );
+	}
 }
 
 void GMQTT::reconnect()
 {
-  while( !theClient.connected() )
-  {
-    Serial.print("GMQTT " );
-    Serial.print( "( " );
-    Serial.print( theClientID );
-    Serial.print( " ) Connecting.... ");
-    char lTopic[ 512 ];
-    sprintf( lTopic, "system/%s", theSystemName );
-    if( theClient.connect( theClientID, theUserID, thePassword, lTopic, 2, true, "OFF" ) )
-    {
-      Serial.println(" Connected");
-      publish( lTopic, "ON", true );
-
-      char lJSON[ 1024 ];
-      sprintf( lTopic, "homeassistant/binary_sensor/%ssystem/config", theSystemName );
-      sprintf( lJSON, "{ \"name\": \"%ssystem\", \"state_topic\": \"system/%s\", \"device_class\": \"connectivity\" }", theSystemName, theSystemName );
-      publish( lTopic, lJSON, true );
-    }
-    else
-    {
-      Serial.print("failed, Error = " );
-      Serial.print( theClient.state() );
-      Serial.println(" .. trying again in 5 seconds" );
-      delay( 5000 );
-    }
-  }
+	if( !theClient.connected() )
+	{
+		Serial.print("GMQTT " );
+		Serial.print( "( " );
+		Serial.print( theClientID );
+		Serial.print( " ) Connecting.... ");
+		if( theClient.connect( theClientID.c_str(), theUserID.c_str(), thePassword.c_str(), theStateSensor->getStateTopic().c_str(), 2, true, "OFF" ) )
+		{
+			Serial.println(" Connected");
+			theStateSensor->sendDiscovery();
+			theStateSensor->setState( true );
+		}
+		else
+		{
+			Serial.print("failed, Error = " );
+			Serial.print( theClient.state() );
+		}
+	}
 }
 
-void GMQTT::connect( const char* pClientID, const char* pUser, const char* pPassword )
+void GMQTT::connect( String pClientID, String pUser, String pPassword )
 {
-  theClientID = pClientID;
-  theUserID = pUser;
-  thePassword = pPassword;
+	theClientID = pClientID;
+	theUserID = pUser;
+	thePassword = pPassword;
 
-  reconnect();
+	reconnect();
 }
 
-void GMQTT::subscribe( const char* pTopic )
+void GMQTT::subscribe( String pTopic )
 {
-  theClient.subscribe( pTopic );
+	theClient.subscribe( pTopic.c_str() );
 }
 
-void GMQTT::publish( const char* pTopic, const char* pMessage, bool pRetain )
+void GMQTT::publish( String pTopic, String pMessage, bool pRetain )
 {
-  theClient.publish( pTopic, pMessage, pRetain );
+	Serial.print( "Sending " );
+	Serial.print( pMessage );
+	Serial.print( " to " );
+	Serial.println( pTopic );
+	theClient.publish( pTopic.c_str(), pMessage.c_str(), pRetain );
 }
 
 void GMQTT::loop()
 {
-  reconnect();
-  theClient.loop();
+	reconnect();
+	theClient.loop();
+}
+
+void GMQTT::addListener(MQTTListener *pListener)
+{
+	theListeners.push_back( pListener );
 }
