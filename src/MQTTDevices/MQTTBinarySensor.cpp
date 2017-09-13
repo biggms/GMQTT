@@ -6,9 +6,18 @@ void MQTTBinarySensor::setup( GMQTT* pClient, String pName, String pStateTopic, 
 	theDeviceClass = pDeviceClass;
 }
 
-void MQTTBinarySensor::setState( bool pOn )
+void MQTTBinarySensor::setState( bool pOn, bool pForce )
 {
-	theClient->publish( theStateTopic, pOn ? "ON" : "OFF", true );
+	if( theState != pOn || pForce )
+	{
+		theState = pOn;
+		theClient->publish( theStateTopic, theState ? "ON" : "OFF", true );
+	}
+}
+
+bool MQTTBinarySensor::getState()
+{
+	return theState;
 }
 
 String MQTTBinarySensor::getType()
@@ -24,8 +33,19 @@ String MQTTBinarySensor::getJSON()
 
 void MQTTBinarySensor::newMessage( String pTopic, String pMessage )
 {
-	Serial.print( "Got a message2: " );
-	Serial.print( pMessage );
-	Serial.print( " from2: " );
-	Serial.println( pTopic );
+	if( pTopic == theStateTopic )
+	{
+		Serial.print( String( millis() ) );
+		Serial.print( ": " );
+		Serial.print( pMessage );
+		Serial.print( " from: " );
+		Serial.println( pTopic );
+		theState = pMessage == "ON" ? true : false;
+		setState(theState);
+	}
+}
+
+void MQTTBinarySensor::reconnected()
+{
+	setState( theState, true );
 }

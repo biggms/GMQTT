@@ -23,6 +23,9 @@ class GMQTT
 		void loop();
 		void addListener( MQTTListener* pListener );
 		void callback( char* pTopic, byte* pPayload, unsigned int pLength );
+		bool getStayConnected();
+		void flush();
+		String getAvailabilityTopic();
 
 	private:
 		WiFiClient theWifi;
@@ -30,15 +33,17 @@ class GMQTT
 		Vector<MQTTListener*> theListeners;
 
 		String theSystemName;
+		String theStayOnlineTopic = "UNSET";
 		String theClientID;
 		String theUserID;
 		String thePassword;
 
 		bool theDoDiscovery;
+		bool theStayConnected = false;
 
 		MQTTBinarySensor* theStateSensor;
 
-		void reconnect();
+		void reconnect( bool pInitial = false );
 };
 
 #endif

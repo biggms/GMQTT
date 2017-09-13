@@ -10,10 +10,11 @@ void MQTTDevice::setup( GMQTT* pClient, String pName, String pStateTopic )
 
 void MQTTDevice::sendDiscovery()
 {
-	theClient->publish( getConfigTopic().c_str(), getConfigMessage().c_str(), false );
+	theClient->publish( getConfigTopic().c_str(), getConfigMessage().c_str(), true );
 }
 
-const String MQTTDevice::getStateTopic() const {
+const String MQTTDevice::getStateTopic() const
+{
 	return theStateTopic;
 }
 
