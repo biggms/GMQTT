@@ -55,7 +55,8 @@ cache:
 
 install:
     - pip install -U platformio
-    - platformio lib install https://github.com/biggms/pubsubclient.git
+    - wget https://github.com/biggms/pubsubclient/archive/master.zip -O /tmp/pubsub.zip
+    - unzip /tmp/pubsub.zip -d /tmp
 
 script:
-    - platformio ci --lib="." --board=nodemcuv2 examples src
+    - platformio ci --lib="/tmp/pubsubclient-master" --board=nodemcuv2 examples src
