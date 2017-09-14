@@ -44,18 +44,18 @@
 # Template #2: The project is intended to by used as a library with examples
 #
 
- language: python
- python:
-     - "2.7"
+language: python
+python:
+    - "2.7"
 
- sudo: false
- cache:
-     directories:
-         - "~/.platformio"
+sudo: false
+cache:
+    directories:
+        - "~/.platformio"
 
- install:
-     - pip install -U platformio
-     - platformio lib install https://github.com/biggms/pubsubclient.git
+install:
+    - pip install -U platformio
+#     - platformio lib install https://github.com/biggms/pubsubclient.git
 
- script:
-     - platformio ci --lib="." --board=nodemcuv2 examples src
+script:
+    - platformio ci --lib="." --board=nodemcuv2 examples src
