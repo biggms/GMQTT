@@ -34,3 +34,8 @@ void MQTTSensor::reconnected()
 {
 	setValue( theValue, true );
 }
+
+void MQTTSensor::chirp()
+{
+	setValue( theValue, true );
+}

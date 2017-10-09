@@ -126,6 +126,20 @@ void GMQTT::publish( String pTopic, String pMessage, bool pRetain )
 void GMQTT::loop()
 {
 	reconnect();
+	if( millis() - theLastTime > 60 * 1000 )
+	{
+		if( theStateSensor != NULL )
+		{
+			theStateSensor->chirp();
+		}
+		for( int i = 0; i < theListeners.size(); i++ )
+		{
+			theListeners[i]->chirp();
+			theWifi.flush();
+			theClient.loop();
+		}
+		theLastTime = millis();
+	}
 	theClient.loop();
 }
 

@@ -8,6 +8,7 @@ class MQTTSensor : public MQTTDevice
 	public:
 		void newMessage( String pTopic, String pMessage );
 		void reconnected();
+		void chirp();
 
 		void setup( GMQTT* pClient, String pName, String pStateTopic, String pUnits );
 		void setValue( String pStatus, bool pForce = false );

@@ -41,7 +41,9 @@ class GMQTT
 		bool theDoDiscovery;
 		bool theStayConnected = false;
 
-		MQTTBinarySensor* theStateSensor;
+		long theLastTime = 0;
+
+		MQTTBinarySensor* theStateSensor = NULL;
 
 		void reconnect( bool pInitial = false );
 };

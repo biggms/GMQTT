@@ -49,3 +49,8 @@ void MQTTBinarySensor::reconnected()
 {
 	setState( theState, true );
 }
+
+void MQTTBinarySensor::chirp()
+{
+	setState( theState, true );
+}

@@ -49,3 +49,8 @@ void MQTTSwitch::reconnected()
 	theClient->subscribe( theStateTopic + "/set" );
 	setState( theState, true );
 }
+
+void MQTTSwitch::chirp()
+{
+	setState( theState, true );
+}
