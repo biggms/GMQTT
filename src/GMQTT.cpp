@@ -86,7 +86,7 @@ void GMQTT::reconnect( bool pInitial )
 				for( int i = 0; i < theListeners.size(); i++ )
 				{
 					theListeners[i]->reconnected();
-					theWifi.flush();
+					//theWifi.flush();
 					theClient.loop();
 				}
 			}
@@ -128,14 +128,10 @@ void GMQTT::loop()
 	reconnect();
 	if( millis() - theLastTime > 60 * 1000 )
 	{
-		if( theStateSensor != NULL )
-		{
-			theStateSensor->chirp();
-		}
 		for( int i = 0; i < theListeners.size(); i++ )
 		{
 			theListeners[i]->chirp();
-			theWifi.flush();
+			//theWifi.flush();
 			theClient.loop();
 		}
 		theLastTime = millis();
@@ -150,5 +146,6 @@ void GMQTT::addListener(MQTTListener *pListener)
 
 void GMQTT::flush()
 {
-	theWifi.flush();
+	//theWifi.flush();
+	theClient.loop();
 }
