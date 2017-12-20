@@ -126,12 +126,11 @@ void GMQTT::publish( String pTopic, String pMessage, bool pRetain )
 void GMQTT::loop()
 {
 	reconnect();
-	if( millis() - theLastTime > 60 * 1000 )
+	if( theDoChirp && millis() - theLastTime > 60 * 1000 )
 	{
 		for( int i = 0; i < theListeners.size(); i++ )
 		{
 			theListeners[i]->chirp();
-			//theWifi.flush();
 			theClient.loop();
 		}
 		theLastTime = millis();
@@ -146,6 +145,10 @@ void GMQTT::addListener(MQTTListener *pListener)
 
 void GMQTT::flush()
 {
-	//theWifi.flush();
 	theClient.loop();
+}
+
+void GMQTT::setDoChirp( bool pDoChirp )
+{
+	theDoChirp = pDoChirp;
 }

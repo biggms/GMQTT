@@ -25,6 +25,7 @@ class GMQTT
 		void callback( char* pTopic, byte* pPayload, unsigned int pLength );
 		bool getStayConnected();
 		void flush();
+		void setDoChirp( bool pChirp ); 
 		String getAvailabilityTopic();
 
 	private:
@@ -40,6 +41,7 @@ class GMQTT
 
 		bool theDoDiscovery;
 		bool theStayConnected = false;
+		bool theDoChirp = true;
 
 		long theLastTime = 0;
 
