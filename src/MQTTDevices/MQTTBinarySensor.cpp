@@ -27,7 +27,7 @@ String MQTTBinarySensor::getType()
 
 String MQTTBinarySensor::getJSON()
 {
-	String lJSON = "\"device_class\": \"" + theDeviceClass + "\"";
+	String lJSON = "\"device_class\": \"" + theDeviceClass + "\", \"availability_topic\": \"" + theClient->getAvailabilityTopic() + "\", \"payload_available\": \"ON\", \"payload_not_available\": \"OFF\", \"payload_on\": \"ON\", \"payload_off\": \"OFF\"";
 	return lJSON;
 }
 

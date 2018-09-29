@@ -27,7 +27,7 @@ String MQTTSwitch::getType()
 
 String MQTTSwitch::getJSON()
 {
-	String lJSON = "\"command_topic\": \"" + theStateTopic + "/set\", \"availability_topic\": \"" + theClient->getAvailabilityTopic() + "\"";
+	String lJSON = "\"command_topic\": \"" + theStateTopic + "/set\", \"availability_topic\": \"" + theClient->getAvailabilityTopic() + "\", \"payload_on\": \"ON\", \"payload_off\": \"OFF\", \"state_on\": \"ON\", \"state_off\": \"OFF\", \"payload_available\": \"ON\", \"payload_not_available\": \"OFF\"";
 	return lJSON;
 }
 
